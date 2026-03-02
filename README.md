@@ -4,8 +4,8 @@
 Simple test install Pelles C.
 
 The Chocolatey Software, Inc. repository contains versions only up to `12.0.2`,
-version `13.01-git-lfs` is installed from this repository (13.01, 23 dec 2025
-[https://www.pellesc.se](https://www.pellesc.se).
+version `13.01-git-lfs` is installed from the current GitHub repository (13.01,
+23 Dec 2025 [https://www.pellesc.se](https://www.pellesc.se).
 
 It seems that in version `11.0.2`, the `cc` command does not work on Windows
 2022/2025.
