@@ -134,7 +134,7 @@ jobs:
             $exitcode = $LASTEXITCODE
             "`"cc hello.c`": FAIL $LASTEXITCODE"
           } else {
-            hello.exe
+            .\hello.exe
             if ($LASTEXITCODE) {
               $exitcode = $LASTEXITCODE
               "`"hello.exe`": FAIL $LASTEXITCODE"
@@ -152,7 +152,7 @@ jobs:
             $exitcode = $LASTEXITCODE
             "`"${{ steps.pelles-c.outputs.sfn }}`": FAIL $LASTEXITCODE"
           } else {
-            hello.exe
+            .\hello.exe
             if ($LASTEXITCODE) {
               $exitcode = $LASTEXITCODE
               "`"hello.exe`": FAIL $LASTEXITCODE"
