@@ -131,7 +131,7 @@ jobs:
           $exitcode = 0
           cc hello.c
           if ($LASTEXITCODE) {
-            if ($env:PellesCDir..Contains(' ')) {
+            if ($env:PellesCDir.Contains(' ')) {
               "`"cc hello.c`": Expected $LASTEXITCODE"
             } else {
               $exitcode = $LASTEXITCODE
