@@ -141,13 +141,13 @@ jobs:
             }
             del hello.obj,hello.exe
           }
-          &"${{ steps.pelles-c.outputs.long }}" hello.c
+          &"${{ steps.pelles-c.outputs.long }}/Bin/cc.exe" hello.c
           if ($LASTEXITCODE) {
             "`"${{ steps.pelles-c.outputs.long }}`": Expected $LASTEXITCODE"
           } else {
             $exitcode = 1
           }
-          &"${{ steps.pelles-c.outputs.sfn }}" hello.c
+          &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
           if ($LASTEXITCODE) {
             $exitcode = $LASTEXITCODE
             "`"${{ steps.pelles-c.outputs.sfn }}`": FAIL $LASTEXITCODE"
