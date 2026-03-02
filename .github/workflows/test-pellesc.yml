@@ -71,7 +71,10 @@ jobs:
             }
             Start-Process "$setup" "/S $sa" -Wait -Verb runas
           } else {
-            choco install --yes --no-progress pelles-c --version=$ver $ia
+            "---"
+            "Try choco install --yes --no-progress pelles-c $ia --version=$ver"
+            "---"
+            choco install --yes --no-progress pelles-c $ia --version=$ver
           }
           cmd /c "`"$pd\Bin\povars64.bat`" && set" | .{process{
             if ($_ -match '^((pellescdir|include|lib|path)[^=]*)=(.*)') {
@@ -105,7 +108,7 @@ jobs:
               | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           } else {
             $long = "c:\space pellesc"
-            mklink /j $long $pd_pellescdir
+            New-Item -Path $long -ItemType Junction -Value $pd_pellescdir
             "long=$long`n" + `
             "sfn=$pd_pellescdir`n" `
               | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
