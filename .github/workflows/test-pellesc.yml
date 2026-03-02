@@ -61,7 +61,7 @@ jobs:
             if ( `
             '84E586D1FCA7B9FEC55BD294A103AF16A045D1DF1BCB77A3F4FDF13D8F239141' `
                 -ne $shasum.Hash) {
-              "$setup: corrupted"
+              "`"$setup`": corrupted"
               TODO-Fail
             }
             Start-Process $setup "/S" $sa -Wait -Verb runas
