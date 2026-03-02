@@ -7,7 +7,7 @@ name: Test Pelles C
 
 env:
   env-workaround: false  # true -> Covert PATH and environment variables to SFN
-  install-workaround: false  # true -> Install Pelles C to `C:\pellesc`
+  install-workaround: true  # true -> Install Pelles C to `C:\pellesc`
 
 on:  # yamllint disable-line rule:truthy
   push:
