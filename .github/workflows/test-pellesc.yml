@@ -56,6 +56,7 @@ jobs:
           $ver = "${{ matrix.version }}"
           $setup = "dist\$ver\setup.exe"
           if (Test-Path -Path $setup -PathType Leaf) {
+            git lfs pull
             $shasum = (Get-FileHash $setup)
             $shasum
             if ( `
@@ -68,7 +69,7 @@ jobs:
           } else {
             choco install --yes --no-progress pelles-c --version=$ver $ia
           }
-          cmd /c "$pd\Bin\povars64.bat && set" | .{process{
+          cmd /c "`"$pd\Bin\povars64.bat`" && set" | .{process{
             if ($_ -match '^((pellescdir|include|lib|path)[^=]*)=(.*)') {
               Set-Variable ("pd_" + $matches[1]) $matches[3]
             }
