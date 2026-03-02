@@ -1,0 +1,31 @@
+[![Test Pelles C](https://github.com/Serge3leo/test-pellesc/actions/workflows/test-pellesc.yml/badge.svg)](https://github.com/Serge3leo/test-pellesc/actions/workflows/test-pellesc.yml)
+
+# test-pellesc
+Простая проверка установки Pelles C.
+
+Репозиторий Chocolatey Software, Inc. содержит версии только до `12.0.2`,
+версия `13.01-git-lfs` устанавливается из из этого репозитория (13.01, 23 дек
+2025 [https://www.pellesc.se](https://www.pellesc.se).
+
+# Проверка ошибки длинных имён
+Команда `cc` имеет ошибку, в случае если она вызывается с явным указанием пути,
+который имеет пробелы.
+
+Проверяется два варианта её обхода:
+1. Установка в Pelles C в каталог без пробелов на пути. Задаётся параметром
+   `install-workaround: true`;
+
+2. Настройка переменных окружения как Short File Name (SFN). Задаётся
+   параметром `env-workaround: true`;
+
+# Использование
+Сделать fork репозитория. Создать PR с префиксом имени `Test...`, в котором
+можно изменить параметры `install-workaround` или `env-workaround`. Проверить
+протокол GitHub Actions.
+
+# Участие
+Замечания (issues), добавления или исправления (pr) - принимаются и
+приветствуются.
+
+# Лицензия
+[BSD-2-Clause © 2025 Сергей Леонтьев (leo@sai.msu.ru).](LICENSE)
