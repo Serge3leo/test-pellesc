@@ -1,11 +1,11 @@
-[![Test Pelles C](https://github.com/Serge3leo/test-pellesc/actions/workflows/test-pellesc.yml/badge.svg)](https://github.com/Serge3leo/test-pellesc/actions/workflows/test-pellesc.yml)
+[![Test Pelles C](https://github.com/Serge3leo/test-pellesc/actions/workflows/test-pellesc.yml/badge.svg?branch=main)](https://github.com/Serge3leo/test-pellesc/actions/workflows/test-pellesc.yml)
 
 # test-pellesc
 Простая проверка установки Pelles C.
 
 Репозиторий Chocolatey Software, Inc. содержит версии только до `12.0.2`,
 версия `13.01-git-lfs` устанавливается из текущего репозитория GitHub (13.01,
-23 Дек 2025 [https://www.pellesc.se](https://www.pellesc.se).
+23 Дек 2025, [https://www.pellesc.se](https://www.pellesc.se)).
 
 Похоже в версии `11.0.2` команда `cc` не работает на Windows 2022/2025.
 
