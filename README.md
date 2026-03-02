@@ -4,16 +4,19 @@
 Simple test install Pelles C.
 
 The Chocolatey Software, Inc. repository contains versions only up to `12.0.2`,
-version `13.01-git-lfs` is installed from this repository (13.01, 23 dec
-2025 [https://www.pellesc.se](https://www.pellesc.se).
+version `13.01-git-lfs` is installed from this repository (13.01, 23 dec 2025
+[https://www.pellesc.se](https://www.pellesc.se).
+
+It seems that in version `11.0.2`, the `cc` command does not work on Windows
+2022/2025.
 
 # Test for long name bug
-The `cc` command has an bug in case it is called with an explicit path
-that has spaces.
+The `cc` command has an bug in case it is called with an explicit path that has
+spaces.
 
-Two options for its bypass are checked:
-1. Installation in Pelles C to a directory without spaces on the path. It is set by
-   `install-workaround: true`;
+Two options for workarounds it are tested in versions 12.x and 13.x:
+1. Installation in Pelles C to a directory without spaces on the path. It is
+   set by `install-workaround: true`;
 
 2. Setting up environment variables as Short File Name (SFN). It is set by
    `env-workaround: true`;

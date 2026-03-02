@@ -6,8 +6,8 @@
 name: Test Pelles C
 
 env:
-  install-workaround: true  # true -> Install Pelles C to `C:\pellesc`
   env-workaround: false  # true -> Covert PATH and environment variables to SFN
+  install-workaround: false  # true -> Install Pelles C to `C:\pellesc`
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -130,7 +130,7 @@ jobs:
           get-command "${{ steps.pelles-c.outputs.long }}/Bin/cc.exe"
           get-command "${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe"
 
-      - name: Check workaround Pelles C long name bug in `cc`
+      - name: Test workarounds Pelles C long name bug in `cc`
         shell: pwsh -File {0}
         run: |
           $exitcode = 0
@@ -138,7 +138,9 @@ jobs:
           if ($LASTEXITCODE) {
             if ($env:PellesCDir.Contains(' ')) {
               "`"cc hello.c`": Expected $LASTEXITCODE"
-            } elseif ($${{ fromJSON(env.env-workaround) }} -and `
+            } elseif (($${{ fromJSON(env.env-workaround) }} -or `
+                       $${{ fromJSON(env.install-workaround) }}
+                      ) -and `
                       [Version]"11.99" -ge [Version]"${{ matrix.version }}") {
               "`"cc hello.c`": False workaround, expected $LASTEXITCODE"
             } else {
@@ -162,7 +164,8 @@ jobs:
           &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
           if ($LASTEXITCODE) {
             if ([Version]"11.99" -ge [Version]"${{ matrix.version }}") {
-              if ($${{ fromJSON(env.env-workaround) }}) {
+              if ($${{ fromJSON(env.env-workaround) }} -or `
+                  $${{ fromJSON(env.install-workaround) }}) {
                 "`"${{ steps.pelles-c.outputs.sfn }}`":" + `
                 " False workaround, expected $LASTEXITCODE"
               } else {
@@ -178,5 +181,19 @@ jobs:
               $exitcode = $LASTEXITCODE
               "`"hello.exe`": FAIL $LASTEXITCODE"
             }
+            del hello.obj,hello.exe
           }
           $LASTEXITCODE = $exitcode
+
+      - name: Test `pocc`&`polink`
+        run: |
+          pocc hello.c
+          polink hello.obj
+          .\hello.exe
+          del hello.obj,hello.exe
+          "Try `"$env:PellesCDir/Bin/pocc.exe`" hello.c"
+          &"$env:PellesCDir/Bin/pocc.exe" hello.c
+          "Try `"$env:PellesCDir/Bin/polink.exei`" hello.obj"
+          &"$env:PellesCDir/Bin/polink.exe" hello.obj
+          .\hello.exe
+          del hello.obj,hello.exe
