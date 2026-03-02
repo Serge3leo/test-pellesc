@@ -1,0 +1,199 @@
+---
+# vim:set sw=2 ts=8 et fileencoding=utf8:
+# SPDX-License-Identifier: BSD-2-Clause
+# SPDX-FileCopyrightText: 2026 Сергей Леонтьев (leo@sai.msu.ru)
+
+name: Test Pelles C
+
+env:
+  env-workaround: false  # true -> Covert PATH and environment variables to SFN
+  install-workaround: true  # true -> Install Pelles C to `C:\pellesc`
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        version: [13.01-git-lfs, 12.0.2, 11.0.2]
+        include:
+          - version: 13.01-git-lfs
+            os: windows-2025-vs2026
+          - version: 12.0.2
+            os: windows-2022
+          - version: 11.0.2
+            os: windows-2025
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: GitHub LFS pull
+        if: ${{ endsWith(matrix.version, '-git-lfs') }}
+        run: git lfs pull
+
+      - name: Lint
+        run: |
+          python -m pip install yamllint
+          python -m yamllint --list-file .
+          python -m yamllint .
+
+      - name: Install Pelles C
+        id: pelles-c
+        run: |
+          if ($${{ fromJSON(env.install-workaround) }}) {
+            $pd = 'C:\pellesc'
+            $sa = "/D=$pd"
+            $ia = "--install-arguments=$sa"
+          } else {
+            $pd = 'C:\Program Files\PellesC'
+            $sa = ''
+            $ia = ''
+          }
+          $ver = "${{ matrix.version }}"
+          $setup = "dist\$ver\setup.exe"
+          if (Test-Path -Path $setup -PathType Leaf) {
+            git lfs pull
+            $shasum = (Get-FileHash $setup)
+            $shasum
+            if ( `
+            '84E586D1FCA7B9FEC55BD294A103AF16A045D1DF1BCB77A3F4FDF13D8F239141' `
+                -ne $shasum.Hash) {
+              "`"$setup`": corrupted"
+              TODO-Fail
+            }
+            Start-Process "$setup" "/S $sa" -Wait -Verb runas
+          } else {
+            "---"
+            "Try choco install --yes --no-progress pelles-c --version=$ver $ia"
+            "---"
+            choco install --yes --no-progress pelles-c --version=$ver $ia
+          }
+          cmd /c "`"$pd\Bin\povars64.bat`" && set" | .{process{
+            if ($_ -match '^((pellescdir|include|lib|path)[^=]*)=(.*)') {
+              Set-Variable ("pd_" + $matches[1]) $matches[3]
+            }
+          }}
+          $pd_path = $pd_path.Substring(0, $pd_path.IndexOf(';'))
+          $pd_pellescdir_sfn = (cmd /c `
+                                "@for %I in (`"$pd_pellescdir`") do @echo %~sI")
+          if ($${{ fromJSON(env.env-workaround) }}) {
+            $pd_path = $pd_path.Replace($pd_pellescdir, $pd_pellescdir_sfn, `
+                                        'OrdinalIgnoreCase')
+            $pd_lib = $pd_lib.Replace($pd_pellescdir, $pd_pellescdir_sfn, `
+                                      'OrdinalIgnoreCase')
+            $pd_include = $pd_include.Replace($pd_pellescdir, `
+                                              $pd_pellescdir_sfn, `
+                                              'OrdinalIgnoreCase')
+            $pd_pellescdir = $pd_pellescdir.Replace($pd_pellescdir, `
+                                                    $pd_pellescdir_sfn, `
+                                                    'OrdinalIgnoreCase')
+          }
+          "PellesCDir=$pd_pellescdir`n" + `
+          "INCLUDE=$pd_include`n" + `
+          "LIB=$pd_lib`n" `
+            | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "$pd_path`n" `
+            | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          if ($pd.Contains(' ')) {
+            "long=$pd`n" + `
+            "sfn=$pd_pellescdir_sfn`n" `
+              | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } else {
+            $long = "c:\space pellesc"
+            New-Item -Path $long -ItemType Junction -Value $pd_pellescdir
+            "long=$long`n" + `
+            "sfn=$pd_pellescdir`n" `
+              | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+
+      - name: Show versions
+        run: |
+          "PATH=$env:PATH"
+          "---"
+          "PellesCDir=$env:PellesCDir"
+          "INCLUDE=$env:INCLUDE"
+          "LIB=$env:LIB"
+          foreach ($prg in 'cc', 'pocc', 'polink') {
+            try {
+              get-command $prg
+              &$prg | Select-Object -First 1
+            } catch {}
+          }
+          get-command "${{ steps.pelles-c.outputs.long }}/Bin/cc.exe"
+          get-command "${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe"
+
+      - name: Test workarounds Pelles C long name bug in `cc`
+        shell: pwsh -File {0}
+        run: |
+          $exitcode = 0
+          cc hello.c
+          if ($LASTEXITCODE) {
+            if ($env:PellesCDir.Contains(' ')) {
+              "`"cc hello.c`": Expected $LASTEXITCODE"
+            } elseif (($${{ fromJSON(env.env-workaround) }} -or `
+                       $${{ fromJSON(env.install-workaround) }}
+                      ) -and `
+                      [Version]"11.99" -ge [Version]"${{ matrix.version }}") {
+              "`"cc hello.c`": False workaround, expected $LASTEXITCODE"
+            } else {
+              $exitcode = $LASTEXITCODE
+              "`"cc hello.c`": FAIL $LASTEXITCODE"
+            }
+          } else {
+            .\hello.exe
+            if ($LASTEXITCODE) {
+              $exitcode = $LASTEXITCODE
+              "`"hello.exe`": FAIL $LASTEXITCODE"
+            }
+            del hello.obj,hello.exe
+          }
+          &"${{ steps.pelles-c.outputs.long }}/Bin/cc.exe" hello.c
+          if ($LASTEXITCODE) {
+            "`"${{ steps.pelles-c.outputs.long }}`": Expected $LASTEXITCODE"
+          } else {
+            $exitcode = 1
+          }
+          &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
+          if ($LASTEXITCODE) {
+            if ([Version]"11.99" -ge [Version]"${{ matrix.version }}") {
+              if ($${{ fromJSON(env.env-workaround) }} -or `
+                  $${{ fromJSON(env.install-workaround) }}) {
+                "`"${{ steps.pelles-c.outputs.sfn }}`":" + `
+                " False workaround, expected $LASTEXITCODE"
+              } else {
+                "`"${{ steps.pelles-c.outputs.sfn }}`": Expected $LASTEXITCODE"
+              }
+            } else {
+              $exitcode = $LASTEXITCODE
+              "`"${{ steps.pelles-c.outputs.sfn }}`": FAIL $LASTEXITCODE"
+            }
+          } else {
+            .\hello.exe
+            if ($LASTEXITCODE) {
+              $exitcode = $LASTEXITCODE
+              "`"hello.exe`": FAIL $LASTEXITCODE"
+            }
+            del hello.obj,hello.exe
+          }
+          $LASTEXITCODE = $exitcode
+
+      - name: Test `pocc`&`polink`
+        run: |
+          pocc hello.c
+          polink hello.obj
+          .\hello.exe
+          del hello.obj,hello.exe
+          "Try `"$env:PellesCDir/Bin/pocc.exe`" hello.c"
+          &"$env:PellesCDir/Bin/pocc.exe" hello.c
+          "Try `"$env:PellesCDir/Bin/polink.exei`" hello.obj"
+          &"$env:PellesCDir/Bin/polink.exe" hello.obj
+          .\hello.exe
+          del hello.obj,hello.exe
