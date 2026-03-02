@@ -136,8 +136,8 @@ jobs:
           $exitcode = 0
           cc hello.c
           if ($LASTEXITCODE) {
-            if ($env:PellesCDir.Contains(' ') || `
-                ($${{ fromJSON(env.env-workaround) }} && `
+            if ($env:PellesCDir.Contains(' ') -or `
+                ($${{ fromJSON(env.env-workaround) }} -and `
                  [Version]"11.99" -ge [Version]"${{ matrix.version }}") `
                ) {
               "`"cc hello.c`": Expected $LASTEXITCODE"
