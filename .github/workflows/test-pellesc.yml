@@ -72,9 +72,9 @@ jobs:
             Start-Process "$setup" "/S $sa" -Wait -Verb runas
           } else {
             "---"
-            "Try choco install --yes --no-progress pelles-c $ia --version=$ver"
+            "Try choco install --yes --no-progress pelles-c --version=$ver $ia"
             "---"
-            choco install --yes --no-progress pelles-c $ia --version=$ver
+            choco install --yes --no-progress pelles-c --version=$ver $ia
           }
           cmd /c "`"$pd\Bin\povars64.bat`" && set" | .{process{
             if ($_ -match '^((pellescdir|include|lib|path)[^=]*)=(.*)') {
