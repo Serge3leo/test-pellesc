@@ -139,8 +139,7 @@ jobs:
             if ($env:PellesCDir.Contains(' ')) {
               "`"cc hello.c`": Expected $LASTEXITCODE"
             } elseif ($${{ fromJSON(env.env-workaround) }} -and `
-                      [Version]"11.99" -ge [Version]"${{ matrix.version }}") `
-                      ) {
+                      [Version]"11.99" -ge [Version]"${{ matrix.version }}") {
               "`"cc hello.c`": False workaround, expected $LASTEXITCODE"
             } else {
               $exitcode = $LASTEXITCODE
