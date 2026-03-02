@@ -7,7 +7,7 @@ name: Test Pelles C
 
 env:
   install-workaround: false  # true -> Install Pelles C to `C:\pellesc`
-  env-workaround: true  # true -> Covert PATH and environment variables to SFN
+  env-workaround: false  # true -> Covert PATH and environment variables to SFN
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -162,7 +162,12 @@ jobs:
           &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
           if ($LASTEXITCODE) {
             if ([Version]"11.99" -ge [Version]"${{ matrix.version }}") {
-              "`"${{ steps.pelles-c.outputs.sfn }}`": Expected $LASTEXITCODE"
+              if ($${{ fromJSON(env.env-workaround) }}) {
+                "`"${{ steps.pelles-c.outputs.sfn }}`":" + `
+                " False workaround, expected $LASTEXITCODE"
+              } else {
+                "`"${{ steps.pelles-c.outputs.sfn }}`": Expected $LASTEXITCODE"
+              }
             } else {
               $exitcode = $LASTEXITCODE
               "`"${{ steps.pelles-c.outputs.sfn }}`": FAIL $LASTEXITCODE"
