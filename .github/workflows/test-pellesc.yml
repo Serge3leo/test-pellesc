@@ -134,6 +134,7 @@ jobs:
         shell: pwsh -File {0}
         run: |
           $exitcode = 0
+          "Try: cc hello.c"
           cc hello.c
           if ($LASTEXITCODE) {
             if ($env:PellesCDir.Contains(' ')) {
@@ -155,13 +156,15 @@ jobs:
             }
             del hello.obj,hello.exe
           }
-          &"${{ steps.pelles-c.outputs.long }}/Bin/cc.exe" hello.c
+          "Try: `"${{ steps.pelles-c.outputs.long }}\Bin\cc.exe`" hello.c"
+          &"${{ steps.pelles-c.outputs.long }}\Bin\cc.exe" hello.c
           if ($LASTEXITCODE) {
             "`"${{ steps.pelles-c.outputs.long }}`": Expected $LASTEXITCODE"
           } else {
             $exitcode = 1
           }
-          &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
+          "Try: `"${{ steps.pelles-c.outputs.sfn }}\Bin\cc.exe`" hello.c"
+          &"${{ steps.pelles-c.outputs.sfn }}\Bin\cc.exe" hello.c
           if ($LASTEXITCODE) {
             if ([Version]"11.99" -ge [Version]"${{ matrix.version }}") {
               if ($${{ fromJSON(env.env-workaround) }} -or `
@@ -187,13 +190,15 @@ jobs:
 
       - name: Test `pocc`&`polink`
         run: |
+          "Try: pocc hello.c"
           pocc hello.c
+          "Try: polink hello.obj"
           polink hello.obj
           .\hello.exe
           del hello.obj,hello.exe
-          "Try `"$env:PellesCDir/Bin/pocc.exe`" hello.c"
-          &"$env:PellesCDir/Bin/pocc.exe" hello.c
-          "Try `"$env:PellesCDir/Bin/polink.exei`" hello.obj"
-          &"$env:PellesCDir/Bin/polink.exe" hello.obj
+          "Try: `"$env:PellesCDir\Bin\pocc.exe`" hello.c"
+          &"$env:PellesCDir\Bin\pocc.exe" hello.c
+          "Try: `"$env:PellesCDir\Bin\polink.exe`" hello.obj"
+          &"$env:PellesCDir\Bin\polink.exe" hello.obj
           .\hello.exe
           del hello.obj,hello.exe
