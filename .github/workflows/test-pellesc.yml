@@ -101,7 +101,7 @@ jobs:
           } else {
             $long = "c:\space pellesc"
             mklink /j $long $pd_pellescdir
-            long=$long`n" + `
+            "long=$long`n" + `
             "sfn=$pd_pellescdir`n" `
               | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           }
