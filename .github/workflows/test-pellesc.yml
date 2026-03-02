@@ -198,7 +198,7 @@ jobs:
           del hello.obj,hello.exe
           "Try: `"$env:PellesCDir\Bin\pocc.exe`" hello.c"
           &"$env:PellesCDir\Bin\pocc.exe" hello.c
-          "Try: `"$env:PellesCDir\Bin\polink.exei`" hello.obj"
+          "Try: `"$env:PellesCDir\Bin\polink.exe`" hello.obj"
           &"$env:PellesCDir\Bin\polink.exe" hello.obj
           .\hello.exe
           del hello.obj,hello.exe
