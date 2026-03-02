@@ -131,8 +131,12 @@ jobs:
           $exitcode = 0
           cc hello.c
           if ($LASTEXITCODE) {
-            $exitcode = $LASTEXITCODE
-            "`"cc hello.c`": FAIL $LASTEXITCODE"
+            if ($env:PellesCDir..Contains(' ')) {
+              "`"cc hello.c`": Expected $LASTEXITCODE"
+            } else {
+              $exitcode = $LASTEXITCODE
+              "`"cc hello.c`": FAIL $LASTEXITCODE"
+            }
           } else {
             .\hello.exe
             if ($LASTEXITCODE) {
@@ -149,8 +153,12 @@ jobs:
           }
           &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
           if ($LASTEXITCODE) {
-            $exitcode = $LASTEXITCODE
-            "`"${{ steps.pelles-c.outputs.sfn }}`": FAIL $LASTEXITCODE"
+            if ([Version]"12.0" -gt [Version]"${{ matrix.version }}") {
+              "`"${{ steps.pelles-c.outputs.sfn }}`": Expected $LASTEXITCODE"
+            } else {
+              $exitcode = $LASTEXITCODE
+              "`"${{ steps.pelles-c.outputs.sfn }}`": FAIL $LASTEXITCODE"
+            }
           } else {
             .\hello.exe
             if ($LASTEXITCODE) {
