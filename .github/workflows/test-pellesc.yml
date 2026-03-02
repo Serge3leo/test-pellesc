@@ -35,6 +35,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: GitHub LFS pull
+        run: git lfs pull
+
       - name: Lint
         run: |
           python -m pip install yamllint
@@ -137,7 +140,7 @@ jobs:
           del hello.obj,hello.exe
           &"${{ steps.pelles-c.outputs.long }}" hello.c
           if ($LASTEXITCODE) {
-            "`"${{ steps.pelles-c.outputs.long }}`"": Expected $LASTEXITCODE"
+            "`"${{ steps.pelles-c.outputs.long }}`": Expected $LASTEXITCODE"
           } else {
             $exitcode = 1
           }
