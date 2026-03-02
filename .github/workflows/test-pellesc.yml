@@ -102,7 +102,7 @@ jobs:
             | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
           "$pd_path`n" `
             | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-          if ($pd_pellescdir.Contains(' ')) {
+          if ($pd.Contains(' ')) {
             "long=$pd_pellescdir`n" + `
             "sfn=$pd_pellescdir_sfn`n" `
               | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
@@ -134,7 +134,10 @@ jobs:
           $exitcode = 0
           cc hello.c
           if ($LASTEXITCODE) {
-            if ($env:PellesCDir.Contains(' ')) {
+            if ($env:PellesCDir.Contains(' ') || `
+                ($${{ fromJSON(env.env-workaround) }} && `
+                 [Version]"11.99" -ge [Version]"${{ matrix.version }}") `
+               ) {
               "`"cc hello.c`": Expected $LASTEXITCODE"
             } else {
               $exitcode = $LASTEXITCODE
@@ -156,7 +159,7 @@ jobs:
           }
           &"${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe" hello.c
           if ($LASTEXITCODE) {
-            if ([Version]"12.0" -gt [Version]"${{ matrix.version }}") {
+            if ([Version]"11.99" -ge [Version]"${{ matrix.version }}") {
               "`"${{ steps.pelles-c.outputs.sfn }}`": Expected $LASTEXITCODE"
             } else {
               $exitcode = $LASTEXITCODE
