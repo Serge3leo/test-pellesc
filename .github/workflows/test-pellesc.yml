@@ -68,7 +68,7 @@ jobs:
               "`"$setup`": corrupted"
               TODO-Fail
             }
-            Start-Process $setup "/S" $sa -Wait -Verb runas
+            Start-Process $setup "$setup" "/S $sa" -Wait -Verb runas
           } else {
             choco install --yes --no-progress pelles-c --version=$ver $ia
           }
@@ -125,6 +125,7 @@ jobs:
           }
 
       - name: Check workaround Pelles C long name bug in `cc`
+        shell: pwsh -File {0}
         run: |
           $exitcode = 0
           cc hello.c
