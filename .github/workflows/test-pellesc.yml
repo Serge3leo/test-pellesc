@@ -103,7 +103,7 @@ jobs:
           "$pd_path`n" `
             | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           if ($pd.Contains(' ')) {
-            "long=$pd_pellescdir`n" + `
+            "long=$pd`n" + `
             "sfn=$pd_pellescdir_sfn`n" `
               | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
           } else {
@@ -127,6 +127,8 @@ jobs:
               &$prg | Select-Object -First 1
             } catch {}
           }
+          get-command "${{ steps.pelles-c.outputs.long }}/Bin/cc.exe"
+          get-command "${{ steps.pelles-c.outputs.sfn }}/Bin/cc.exe"
 
       - name: Check workaround Pelles C long name bug in `cc`
         shell: pwsh -File {0}
